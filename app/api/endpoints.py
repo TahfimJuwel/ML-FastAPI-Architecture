@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-# import all the pieces just built
+# import all the pieces from every file in the "app"
 from app.db.database import get_db
 from app.models.sentiment import SentimentLogTable
 from app.schemas.sentiment import TextInput
