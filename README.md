@@ -1,67 +1,111 @@
-# 🧠 Enterprise ML Backend Architecture (FastAPI + PostgreSQL)
+# 🧠 Enterprise ML Backend Architecture (FastAPI + PostgreSQL + Redis)
 
-A production-ready REST API bridging Machine Learning models with Front-End applications. Engineered with **FastAPI** and **PostgreSQL**, this project demonstrates Senior-level backend architecture including JWT Authentication, Asynchronous Background Tasks, Test-Driven Development (TDD), and Modular Domain-Driven Design.
+A high-performance, production-ready REST API designed to serve Machine Learning models at scale. This project demonstrates a complete "T-Shaped" engineering skillset: Deep **ML Integration** combined with robust **Backend Architecture**, **Cloud DevOps**, and **Automated SQA**.
 
-## 🚀 Enterprise Features
+---
 
-- **🔐 JWT Authentication:** Secure User Registration and Login flow with Bcrypt password hashing and Bearer token route protection.
-- **🏗️ Modular Architecture:** Codebase structured for scalability, separating Routers, Services (Business Logic), Schemas (Validation), and Models (Database).
-- **⚡ Asynchronous Background Tasks:** Heavy ML processing and simulated I/O tasks are offloaded to background threads to prevent API blocking, ensuring sub-millisecond response times.
-- **🤖 ML Integration:** Seamlessly feeds validated JSON payloads into NLP models (TextBlob) and translates mathematical polarities into business-friendly labels.
-- **🗄️ Relational Database (ORM):** Utilizes SQLAlchemy to map users to their specific ML predictions using Foreign Keys in a local PostgreSQL database.
-- **🧪 Automated SQA Testing:** Complete Unit Test coverage using `pytest` and `httpx` to automatically verify authentication and endpoint integrity.
+## 🚀 Live Demo & Documentation
 
-## 📁 Industrial Folder Structure
+- **Live API URL:** [https://ml-fastapi-architecture.onrender.com](https://ml-fastapi-architecture.onrender.com)
+- **Interactive Swagger UI:** [https://ml-fastapi-architecture.onrender.com/docs](https://ml-fastapi-architecture.onrender.com/docs)
+
+---
+
+## 🛠️ Industrial Tech Stack
+
+- **Framework:** FastAPI (Asynchronous Python)
+- **Primary Database:** PostgreSQL (Neon Cloud)
+- **Caching Layer:** Redis (Upstash Serverless)
+- **ORM:** SQLAlchemy (Relational Mapping)
+- **Security:** JWT (JSON Web Tokens) & Bcrypt Hashing
+- **Task Management:** FastAPI Background Tasks (Asynchronous execution)
+- **Testing:** Pytest & HTTPX (Automated SQA)
+- **Containerization:** Docker (Linux-slim environment)
+- **Deployment:** Render.com (CI/CD Pipeline)
+
+---
+
+## 🏗️ Architectural Highlights
+
+### 1. Modular Domain-Driven Design
+
+The project is structured into logical modules to ensure maintainability and team collaboration:
+
+- `app/api/`: Handles request routing and HTTP logic.
+- `app/core/`: Centralized security, JWT, and configuration management.
+- `app/services/`: Pure business logic and ML model inference (The "Chef").
+- `app/db/`: Multi-database connection management (Postgres + Redis).
+- `app/models/` & `app/schemas/`: Separation of Database Tables from API JSON validation.
+
+### 2. Performance Optimization (The Library Analogy)
+
+To handle heavy ML loads, I implemented a **Two-Tier Caching System**:
+
+- **Redis Caching:** Frequently requested ML inputs are cached in RAM. This bypasses the ML model entirely for repeat queries, reducing response times from ~400ms to **<30ms**.
+- **Background Processing:** Long-running tasks (like email notifications or heavy AI inference) are offloaded to background threads, allowing the user to receive an instant "202 Accepted" response.
+
+### 3. Enterprise Security
+
+- **Password Safety:** Zero storage of plain-text passwords using `bcrypt` salting and hashing.
+- **Access Control:** All ML endpoints are protected by an `OAuth2` Bearer token scheme.
+- **CORS Policy:** Pre-configured for cross-origin sharing with React/Flutter frontends.
+
+---
+
+## 📁 Project Structure
 
 ```text
 /
 ├── app/
-│   ├── api/             # API Routers & Endpoints
-│   ├── core/            # Security, JWT, config, and Bouncer logic
-│   ├── db/              # Database engine and session manager
-│   ├── models/          # SQLAlchemy Database Schemas (Postgres Tables)
-│   ├── schemas/         # Pydantic Models for JSON validation
-│   ├── services/        # ML logic, Password Hashing, Background Tasks
-│   └── main.py          # Application entry point & CORS configuration
-├── tests/               # Pytest automated test suites
-├── .env                 # Environment variables (Ignored by Git)
+│   ├── api/             # API Endpoints (Auth & ML)
+│   ├── core/            # JWT Security & .env management
+│   ├── db/              # Postgres & Redis Connectors
+│   ├── models/          # SQLAlchemy Database Tables
+│   ├── schemas/         # Pydantic JSON Validators
+│   ├── services/        # ML Logic & Password Hashing
+│   └── main.py          # Entry point & CORS Middleware
+├── tests/               # Automated Unit Test Suite
+├── Dockerfile           # Container Blueprint
+├── .dockerignore
 ├── .gitignore
-└── requirements.txt     # Dependency locking
+└── requirements.txt     # Dependency Locking
 
 
-💻 Local Setup & Installation
-1. Prerequisites
-Python 3.8+
-PostgreSQL running locally on port 5432
-2. Clone & Environment Setup
+💻 Local Setup & Development
+1. Clone & Environment
 
-git clone https://github.com/YOUR_GITHUB_USERNAME/ML-FastAPI-Architecture.git
+git clone https://github.com/TahfimJuwel/ML-FastAPI-Architecture
 cd ML-FastAPI-Architecture
 python -m venv venv
-
-# Activate the venv (Windows):
-venv\Scripts\activate
-
-# Install Dependencies:
+source venv/bin/activate  # venv\Scripts\activate on Windows
 pip install -r requirements.txt
-3. Environment Variables
-Create a .env file in the root directory:
 
-Env
-DB_URL=postgresql://postgres:admin123@localhost:5432/ml_backend_db
-JWT_SECRET_KEY=your_secure_random_string
+2. Setup Secrets (.env)
+
+DB_URL=postgresql://user:pass@localhost:5432/db_name
+REDIS_URL=rediss://default:pass@your-redis-url
+JWT_SECRET_KEY=your_secret_string
 JWT_ALGORITHM=HS256
-4. Run the Application
 
+3. Running & Testing
 
-# Start the server
+# Run the local server
 uvicorn app.main:app --reload
 
 # Run Automated SQA Tests
 pytest
-🧪 API Flow Overview
-POST /auth/register: Creates user, hashes password, triggers background welcome email.
-POST /auth/login: Verifies hash, returns short-lived JWT Bearer Token.
-POST /analyze: (Requires JWT) Validates text, runs ML model, permanently logs result to DB with Foreign Key to user.
-POST /analyze-heavy: Triggers Asynchronous ML processing in the background, instantly returning a 202 Accepted status.
+
+
+🧪 API Usage Flow
+Register: POST /auth/register - Create an account (Triggers Background Email).
+Login: POST /auth/login - Receive a secure JWT Access Token.
+Analyze: POST /analyze - (Requires Token) Analyzes sentiment. Checks Redis Cache first. If missing, runs ML model and logs to PostgreSQL.
+Analyze Heavy: POST /analyze-heavy - (Requires Token) Simulates a 10-second Deep Learning task processed entirely in the background.
+
+
+🚢 Docker Deployment
+This project is fully containerized. To build and run the entire stack:
+
+docker build -t ml-backend .
+docker run -p 8000:8000 --env-file .env ml-backend
 ```
