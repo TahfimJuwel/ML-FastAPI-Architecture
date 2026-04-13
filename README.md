@@ -13,7 +13,7 @@ A production-ready REST API bridging Machine Learning models with Front-End appl
 
 ## 📁 Industrial Folder Structure
 
-````text
+```text
 /
 ├── app/
 │   ├── api/             # API Routers & Endpoints
@@ -35,7 +35,6 @@ Python 3.8+
 PostgreSQL running locally on port 5432
 2. Clone & Environment Setup
 
-```text
 git clone https://github.com/YOUR_GITHUB_USERNAME/ML-FastAPI-Architecture.git
 cd ML-FastAPI-Architecture
 python -m venv venv
@@ -65,4 +64,4 @@ POST /auth/register: Creates user, hashes password, triggers background welcome 
 POST /auth/login: Verifies hash, returns short-lived JWT Bearer Token.
 POST /analyze: (Requires JWT) Validates text, runs ML model, permanently logs result to DB with Foreign Key to user.
 POST /analyze-heavy: Triggers Asynchronous ML processing in the background, instantly returning a 202 Accepted status.
-````
+```
