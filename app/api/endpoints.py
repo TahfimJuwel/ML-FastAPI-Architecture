@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
 
 # import all the pieces from every file in the "app"
@@ -7,7 +7,7 @@ from app.models.sentiment import SentimentLogTable
 from app.schemas.sentiment import TextInput
 # from app.core.security import verify_api_key
 from app.core.security import get_current_user 
-from app.services.ml_service import analyze_sentiment
+from app.services.ml_service import analyze_sentiment, run_heavy_ml_in_background
 from app.models.user import UserTable
 
 # APIRouter is like a "Mini FastAPI" just for this file.
@@ -45,4 +45,19 @@ def analyze_text(
     return {
         "message": f"Analysis complete and linked to user for user: {current_user_email}", 
         "data": db_log
+    }
+
+@router.post("/analyze-heavy", status_code=202)
+def analyze_heavy_text(
+    request_data: TextInput, 
+    background_tasks: BackgroundTasks,
+    current_user_email: str = Depends(get_current_user) 
+):
+    
+    background_tasks.add_task(run_heavy_ml_in_background, request_data.text, current_user_email)
+    
+    # Return an INSTANT response to the user
+    return {
+        "message": "We have received your massive dataset. The AI is processing it in the background. We will email you when it finishes!",
+        "status": "Processing..."
     }

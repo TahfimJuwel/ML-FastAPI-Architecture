@@ -1,37 +1,63 @@
-# 🧠 Machine Learning Backend Architecture (FastAPI + PostgreSQL)
+# 🧠 Enterprise ML Backend Architecture (FastAPI + PostgreSQL)
 
-An enterprise-grade REST API designed to bridge the gap between Machine Learning models and Web/Mobile Applications. Built with **FastAPI** and **PostgreSQL**, featuring secure API key authentication, ORM database logging, and automated CORS handling.
+A production-ready REST API bridging Machine Learning models with Front-End applications. Engineered with **FastAPI** and **PostgreSQL**, this project demonstrates Senior-level backend architecture including JWT Authentication, Asynchronous Background Tasks, Test-Driven Development (TDD), and Modular Domain-Driven Design.
 
-## 🚀 Features
+## 🚀 Enterprise Features
 
-- **⚡ High-Performance Framework:** Built with FastAPI, utilizing asynchronous architecture for maximum speed.
-- **🤖 ML Integration:** Seamlessly receives raw text, validates it via Pydantic, and feeds it into an NLP model (TextBlob).
-- **🗄️ Relational Database Logging:** Utilizes SQLAlchemy (ORM) to permanently log user inputs and ML predictions into a local PostgreSQL database.
-- **🔐 API Security:** Protected by Header-based API Key Authentication to prevent unauthorized access and resource exhaustion.
-- **🌐 Web Ready:** Pre-configured with CORS Middleware to allow secure cross-origin requests from React/Vue/Angular frontends.
-- **🛡️ Secrets Management:** Environment variables (`.env`) used to keep database URIs and API keys completely hidden from source control.
+*   **🔐 JWT Authentication:** Secure User Registration and Login flow with Bcrypt password hashing and Bearer token route protection.
+*   **🏗️ Modular Architecture:** Codebase structured for scalability, separating Routers, Services (Business Logic), Schemas (Validation), and Models (Database).
+*   **⚡ Asynchronous Background Tasks:** Heavy ML processing and simulated I/O tasks are offloaded to background threads to prevent API blocking, ensuring sub-millisecond response times.
+*   **🤖 ML Integration:** Seamlessly feeds validated JSON payloads into NLP models (TextBlob) and translates mathematical polarities into business-friendly labels.
+*   **🗄️ Relational Database (ORM):** Utilizes SQLAlchemy to map users to their specific ML predictions using Foreign Keys in a local PostgreSQL database.
+*   **🧪 Automated SQA Testing:** Complete Unit Test coverage using `pytest` and `httpx` to automatically verify authentication and endpoint integrity.
 
-## 🏗️ Architecture Flow
+## 📁 Industrial Folder Structure
 
-1.  **Client Request:** Frontend sends a POST request with a JSON payload.
-2.  **Security Check:** The Dependency Injector checks the HTTP Headers for a valid `x-api-key`. (Rejects with `401 Unauthorized` if invalid).
-3.  **Data Validation:** Pydantic validates the JSON payload to ensure strict data types.
-4.  **ML Processing:** The NLP model analyzes the text and calculates a sentiment polarity score.
-5.  **Database Transaction:** SQLAlchemy opens a secure session, logs the original text, score, and label into PostgreSQL, and closes the session.
-6.  **Response:** The client receives a clean `201 Created` JSON response.
-
-## 💻 Local Setup & Installation
-
-Follow these steps to run this architecture on your local machine.
-
-### 1. Prerequisites
-
-- Python 3.8+
-- PostgreSQL installed and running locally on port `5432`
-
-### 2. Clone the Repository
-
-```bash
+```text
+/
+├── app/
+│   ├── api/             # API Routers & Endpoints
+│   ├── core/            # Security, JWT, config, and Bouncer logic
+│   ├── db/              # Database engine and session manager
+│   ├── models/          # SQLAlchemy Database Schemas (Postgres Tables)
+│   ├── schemas/         # Pydantic Models for JSON validation
+│   ├── services/        # ML logic, Password Hashing, Background Tasks
+│   └── main.py          # Application entry point & CORS configuration
+├── tests/               # Pytest automated test suites
+├── .env                 # Environment variables (Ignored by Git)
+├── .gitignore           
+└── requirements.txt     # Dependency locking
+💻 Local Setup & Installation
+1. Prerequisites
+Python 3.8+
+PostgreSQL running locally on port 5432
+2. Clone & Environment Setup
+code
+Bash
 git clone https://github.com/YOUR_GITHUB_USERNAME/ML-FastAPI-Architecture.git
 cd ML-FastAPI-Architecture
-```
+python -m venv venv
+# Activate the venv (Windows):
+venv\Scripts\activate
+# Install Dependencies:
+pip install -r requirements.txt
+3. Environment Variables (.env)
+Create a .env file in the root directory:
+code
+Env
+DB_URL=postgresql://[user]:[password]@localhost:5432/[db_name]
+JWT_SECRET_KEY=your_secure_random_string
+JWT_ALGORITHM=HS256
+4. Run the Application
+code
+Bash
+# Start the server
+uvicorn app.main:app --reload
+
+# Run Automated SQA Tests
+pytest
+🧪 API Flow Overview
+POST /auth/register: Creates user, hashes password, triggers background welcome email.
+POST /auth/login: Verifies hash, returns short-lived JWT Bearer Token.
+POST /analyze: (Requires JWT) Validates text, runs ML model, permanently logs result to DB with Foreign Key to user.
+POST /analyze-heavy: Triggers Asynchronous ML processing in the background, instantly returning a 202 Accepted status.
