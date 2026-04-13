@@ -17,4 +17,5 @@ COPY ./app /code/app
 EXPOSE 8000
 
 # 7. The command to start the server when the container turns on
-CMD["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Note the space after CMD
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
